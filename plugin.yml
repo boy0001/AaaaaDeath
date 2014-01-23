@@ -1,0 +1,12 @@
+name: AaaaahDeath
+main: com.empcraft.AaaaahDeath
+version: 0.0.1
+author: Empire92
+website: www.empcraft.com
+commands:
+   ad:
+      description: Death!
+   aaaaahdeath:
+      description: Death!
+   death:
+      description: Death!      
