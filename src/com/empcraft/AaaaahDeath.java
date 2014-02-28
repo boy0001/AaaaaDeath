@@ -62,11 +62,10 @@ public final class AaaaahDeath extends JavaPlugin implements Listener {
 	if(event.getEntity() instanceof Player) {
 	Player player = (Player) event.getEntity();
 	try {
-	if (getConfig().getBoolean("multiworld."+player.getWorld().getName()+".health.enabled")) {
+	if (getConfig().getBoolean("multiworld."+player.getWorld().getName()+".stats.health.enabled")) {
 	 if (event.isCancelled()==false) {
 		 if (health.get(player.getName())==null) {
 			 health.put(player.getName(), player.getHealth());
-			 player.sendMessage("B "+player.getHealth());
 		 }
 	 }
 	}
@@ -120,7 +119,7 @@ public final class AaaaahDeath extends JavaPlugin implements Listener {
 					getConfig().getConfigurationSection(getConfig().getString("multiworld."+event.getTo().getWorld().getName().split("_")[0]+".deathban")).set(player.getName(), null);
 				}
 				else {
-					player.sendMessage(ChatColor.GRAY+getmsg("MSG7")+" "+ChatColor.RED+((Long.parseLong((getConfig().getString("multiworld."+event.getTo().getWorld().getName().split("_")[0]+".deathban."+player.getName())))-(System.currentTimeMillis()/1000))/60)+ChatColor.GRAY+" minutes.");
+					msg(player,ChatColor.GRAY+getmsg("MSG7")+" "+ChatColor.RED+((Long.parseLong((getConfig().getString("multiworld."+event.getTo().getWorld().getName().split("_")[0]+".deathban."+player.getName())))-(System.currentTimeMillis()/1000))/60)+ChatColor.GRAY+" minutes.");
 					event.setCancelled(true);
 				}
 			}
@@ -180,14 +179,35 @@ public final class AaaaahDeath extends JavaPlugin implements Listener {
 		}
 		return false;
 	}
-	
+    public void msg(Player player,String mystring) {
+    	if (mystring==null||mystring.equals("")) {
+    		return;
+    	}
+    	if (player==null) {
+    		getServer().getConsoleSender().sendMessage(colorise(mystring));
+    	}
+    	else if (player instanceof Player==false) {
+    		getServer().getConsoleSender().sendMessage(colorise(mystring));
+    	}
+    	else {
+    		player.sendMessage(colorise(mystring));
+    	}
+
+    }
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args){
-		Player player = (Player) sender;
+		Player player;
+		if (sender instanceof Player) {
+			player = (Player) sender;
+		}
+		else {
+			player = null;
+		}
     	String line = "";
     	for (String i:args) {
     		line+=i+" ";
     	}
+    	line = line.trim();
 		if((cmd.getName().equalsIgnoreCase("ad"))||(cmd.getName().equalsIgnoreCase("aaaaahdeath"))||(cmd.getName().equalsIgnoreCase("death"))){
 			boolean hasperm = true;
 			boolean worked = false;
@@ -196,7 +216,7 @@ public final class AaaaahDeath extends JavaPlugin implements Listener {
 	    			hasperm = false;
 	    			if (sender instanceof Player==false) {
 	    				hasperm = true;
-	    				player.sendMessage(getmsg("MSG8"));
+	    				msg(player,getmsg("MSG8"));
 	    			}
 	    			else if (((Player) sender).hasPermission("ad.reload")) {
 	    				hasperm = true;
@@ -222,59 +242,63 @@ public final class AaaaahDeath extends JavaPlugin implements Listener {
 	    			}
 				}
 				else if ((args[0].equalsIgnoreCase("info"))){
-					player.sendMessage(ChatColor.LIGHT_PURPLE+getmsg("MSG9"));
-					
+					msg(player,ChatColor.LIGHT_PURPLE+getmsg("MSG9"));
+					return true;
 				}
 				else if ((args[0].equalsIgnoreCase("help"))){
 					worked = true;
 					// list of commands
-					player.sendMessage(ChatColor.GOLD+"====HELP====");
-					player.sendMessage(ChatColor.GRAY+" - "+ChatColor.GREEN+"/AD help "+ChatColor.GRAY+"- shows this page.");
+					msg(player,ChatColor.GOLD+"====HELP====");
+					msg(player,ChatColor.GRAY+" - "+ChatColor.GREEN+"/AD help "+ChatColor.GRAY+"- shows this page.");
 					if (checkperm(player,"ad.reload")==true) { 
-						player.sendMessage(ChatColor.GRAY+" - "+ChatColor.GREEN+"/AD reload "+ChatColor.GRAY+"- reloads the config.");
+						msg(player,ChatColor.GRAY+" - "+ChatColor.GREEN+"/AD reload "+ChatColor.GRAY+"- reloads the config.");
+					}
+					if (player==null) {
+						msg(player,ChatColor.RED+getmsg("MSG25")+".");
+						return false;
 					}
 					if (getConfig().getString("multiworld."+player.getWorld().getName()+".enabled").equalsIgnoreCase("true")) {
-						player.sendMessage(ChatColor.GRAY+" - "+ChatColor.GREEN+"/AD info "+ChatColor.GRAY+getmsg("MSG10")+ChatColor.GRAY+".");
-						player.sendMessage(ChatColor.GRAY+" - "+ChatColor.GREEN+"/AD "+getmsg("MSG0")+" "+ChatColor.GRAY+getmsg("MSG11")+ChatColor.GRAY+".");
-						player.sendMessage(ChatColor.GRAY+" - "+ChatColor.GREEN+"/AD "+getmsg("MSG1")+" "+ChatColor.GRAY+getmsg("MSG12")+ChatColor.GRAY+".");
-						player.sendMessage(ChatColor.GRAY+" - "+ChatColor.GREEN+"/AD "+getmsg("MSG2")+" "+ChatColor.GRAY+getmsg("MSG13")+ChatColor.GRAY+".");
-						player.sendMessage(ChatColor.GRAY+" - "+ChatColor.GREEN+"/AD "+getmsg("MSG3")+" "+ChatColor.GRAY+getmsg("MSG14")+ChatColor.GRAY+".");
-						player.sendMessage(ChatColor.GRAY+" - "+ChatColor.GREEN+"/AD "+getmsg("MSG4")+" "+ChatColor.GRAY+"- "+getmsg("MSG15")+ChatColor.GRAY+".");
+						msg(player,ChatColor.GRAY+" - "+ChatColor.GREEN+"/AD info "+ChatColor.GRAY+getmsg("MSG10")+ChatColor.GRAY+".");
+						msg(player,ChatColor.GRAY+" - "+ChatColor.GREEN+"/AD "+getmsg("MSG0")+" "+ChatColor.GRAY+getmsg("MSG11")+ChatColor.GRAY+".");
+						msg(player,ChatColor.GRAY+" - "+ChatColor.GREEN+"/AD "+getmsg("MSG1")+" "+ChatColor.GRAY+getmsg("MSG12")+ChatColor.GRAY+".");
+						msg(player,ChatColor.GRAY+" - "+ChatColor.GREEN+"/AD "+getmsg("MSG2")+" "+ChatColor.GRAY+getmsg("MSG13")+ChatColor.GRAY+".");
+						msg(player,ChatColor.GRAY+" - "+ChatColor.GREEN+"/AD "+getmsg("MSG3")+" "+ChatColor.GRAY+getmsg("MSG14")+ChatColor.GRAY+".");
+						msg(player,ChatColor.GRAY+" - "+ChatColor.GREEN+"/AD "+getmsg("MSG4")+" "+ChatColor.GRAY+"- "+getmsg("MSG15")+ChatColor.GRAY+".");
 					}
 					else {
-						player.sendMessage(ChatColor.RED+getmsg("MSG25")+".");
+						msg(player,ChatColor.RED+getmsg("MSG25")+".");
 					}
 				}
 				else if ((args[0].equalsIgnoreCase(getmsg("MSG4")))){
 					worked = true;
-					player.sendMessage(getmsg("MSG16").replace("//","\n"));
+					msg(player,getmsg("MSG16").replace("//","\n"));
 				}
 				else if ((args[0].equalsIgnoreCase(getmsg("MSG1")))){
 					worked = true;
-					player.sendMessage(getmsg("MSG17").replace("//","\n"));
+					msg(player,getmsg("MSG17").replace("//","\n"));
 				}
 				else if ((args[0].equalsIgnoreCase(getmsg("MSG0")))){
 					worked = true;
-					player.sendMessage(getmsg("MSG18").replace("//","\n"));
+					msg(player,getmsg("MSG18").replace("//","\n"));
 				}
 				else if ((args[0].equalsIgnoreCase(getmsg("MSG2")))){
 					worked = true;
-					player.sendMessage(getmsg("MSG19").replace("//","\n"));
+					msg(player,getmsg("MSG19").replace("//","\n"));
 				}
 				else if ((args[0].equalsIgnoreCase(getmsg("MSG3")))){
 					worked = true;
-					player.sendMessage(getmsg("MSG20").replace("//","\n"));
+					msg(player,getmsg("MSG20").replace("//","\n"));
 				}
 			}
 			if ((hasperm==true)&&(worked==false)) {
-				player.sendMessage(ChatColor.GRAY+getmsg("MSG21")+": "+ChatColor.RED+"`"+line+"'"+ChatColor.GRAY+". "+ChatColor.BLUE+getmsg("MSG22")+":");
-				player.sendMessage(ChatColor.GRAY+" - "+ChatColor.GREEN+"/AD help");
-				player.sendMessage(ChatColor.GRAY+" - "+ChatColor.GREEN+"/AD info");
-				player.sendMessage(ChatColor.GRAY+" - "+ChatColor.RED+"/suicide");
+				msg(player,ChatColor.GRAY+getmsg("MSG21")+": "+ChatColor.RED+"`"+line+"'"+ChatColor.GRAY+". "+ChatColor.BLUE+getmsg("MSG22")+":");
+				msg(player,ChatColor.GRAY+" - "+ChatColor.GREEN+"/AD help");
+				msg(player,ChatColor.GRAY+" - "+ChatColor.GREEN+"/AD info");
+				msg(player,ChatColor.GRAY+" - "+ChatColor.RED+"/suicide");
 			}
 			else if (hasperm == false){
-				player.sendMessage(ChatColor.GRAY+"You do not have permission for "+ChatColor.RED+"/AD "+line+ChatColor.GRAY+".");
-				player.sendMessage(ChatColor.BLUE+getmsg("MSG22")+":"+ChatColor.GRAY+"\n - /AD help");
+				msg(player,ChatColor.GRAY+"You do not have permission for "+ChatColor.RED+"/AD "+line+ChatColor.GRAY+".");
+				msg(player,ChatColor.BLUE+getmsg("MSG22")+":"+ChatColor.GRAY+"\n - /AD help");
 			}
 		}
 		return true;
@@ -333,7 +357,7 @@ public final class AaaaahDeath extends JavaPlugin implements Listener {
 						}
 	    				int total = 0;
 	    				int Average = 0;
-						if (getConfig().getBoolean("multiworld."+player.getWorld().getName()+".comfort.enabled")) {
+						if (getConfig().getBoolean("multiworld."+player.getWorld().getName()+".stats.comfort.enabled")) {
 							int comfort = 100;
 							Block block = player.getLocation().getBlock();
 							if (block.getLightLevel()<13) {
@@ -344,9 +368,9 @@ public final class AaaaahDeath extends JavaPlugin implements Listener {
 							String myblock = "" + myloc.getBlock().getTypeId();
 							Location myloc2 = new Location(player.getWorld(),player.getLocation().getX(),player.getLocation().getY()+2,player.getLocation().getZ());
 							int above = myloc2.getBlock().getTypeId();
-							String[] beautiful = getConfig().getString("multiworld."+player.getWorld().getName()+".comfort.beautiful").split(",");
-							String[] nice = getConfig().getString("multiworld."+player.getWorld().getName()+".comfort.nice").split(",");
-							String[] ugly = getConfig().getString("multiworld."+player.getWorld().getName()+".comfort.ugly").split(",");
+							String[] beautiful = getConfig().getString("multiworld."+player.getWorld().getName()+".stats.comfort.beautiful").split(",");
+							String[] nice = getConfig().getString("multiworld."+player.getWorld().getName()+".stats.comfort.nice").split(",");
+							String[] ugly = getConfig().getString("multiworld."+player.getWorld().getName()+".stats.comfort.ugly").split(",");
 							if (contains(beautiful,myblock)||contains(beautiful,blockid)) {
 								comfort+=25;
 							}
@@ -376,7 +400,7 @@ public final class AaaaahDeath extends JavaPlugin implements Listener {
 							}
 							fright.put(player.getName()+".comfort", comfort);
 						}
-						if (getConfig().getBoolean("multiworld."+player.getWorld().getName()+".happiness.enabled")) {
+						if (getConfig().getBoolean("multiworld."+player.getWorld().getName()+".stats.happiness.enabled")) {
 							if (fright.get(player.getName())<1) {
 								fright.put(player.getName(), 0);
 							}
@@ -455,7 +479,7 @@ public final class AaaaahDeath extends JavaPlugin implements Listener {
 		    			if (true) {
 
 		    				Random random = new Random();
-		    				if (getConfig().getBoolean("multiworld."+player.getWorld().getName()+".sleep.enabled")) {
+		    				if (getConfig().getBoolean("multiworld."+player.getWorld().getName()+".stats.sleep.enabled")) {
 		    					try {
 		    						if (fright.get(player.getName()+".sleep")> 0) {
 		    							if (random.nextInt(12)==0) {
@@ -473,7 +497,7 @@ public final class AaaaahDeath extends JavaPlugin implements Listener {
 		    					}
 		    				}
 		    					
-		    					if (getConfig().getBoolean("multiworld."+player.getWorld().getName()+".hunger.enabled")) {
+		    					if (getConfig().getBoolean("multiworld."+player.getWorld().getName()+".stats.hunger.enabled")) {
 		    						fright.put(player.getName()+".hunger",player.getFoodLevel()*5);
 		    						Average += fright.get(player.getName()+".hunger");
 		    						total +=1;
@@ -490,7 +514,7 @@ public final class AaaaahDeath extends JavaPlugin implements Listener {
 		    						}
 		    					}
 		    					}
-		    					if (getConfig().getBoolean("multiworld."+player.getWorld().getName()+".sleep.enabled")) {
+		    					if (getConfig().getBoolean("multiworld."+player.getWorld().getName()+".stats.sleep.enabled")) {
 		    					if (fright.get(player.getName()+".sleep")<15) {
 		    						total+=1;
 		    						fright.put(player.getName(),fright.get(player.getName())-random.nextInt(1));
@@ -509,7 +533,7 @@ public final class AaaaahDeath extends JavaPlugin implements Listener {
 		    					Average+=fright.get(player.getName()+".sleep");
 		    					total +=1;
 		    					}
-		    					if (getConfig().getBoolean("multiworld."+player.getWorld().getName()+".comfort.enabled")) {
+		    					if (getConfig().getBoolean("multiworld."+player.getWorld().getName()+".stats.comfort.enabled")) {
 		    					if (fright.get(player.getName()+".comfort")<15) {
 		    						total+=1;
 		    						if (fright.get(player.getName()+".comfort")<10) {
@@ -523,7 +547,7 @@ public final class AaaaahDeath extends JavaPlugin implements Listener {
 		    					Average+=fright.get(player.getName()+".comfort");
 		    					total +=1;
 		    					}
-	    					if (getConfig().getBoolean("multiworld."+player.getWorld().getName()+".health.enabled")) {
+	    					if (getConfig().getBoolean("multiworld."+player.getWorld().getName()+".stats.health.enabled")) {
 		    					fright.put(player.getName()+".health",(int) Math.round(player.getHealth()*5));
 		    					Average += fright.get(player.getName()+".health");
 		    					total +=1;
@@ -558,27 +582,27 @@ public final class AaaaahDeath extends JavaPlugin implements Listener {
 		    					}
 		    			}
 						try {
-							if (getConfig().getBoolean("multiworld."+player.getWorld().getName()+".happiness.enabled")) {
+							if (getConfig().getBoolean("multiworld."+player.getWorld().getName()+".stats.happiness.enabled")) {
 								Score myscore = objective.getScore(Bukkit.getOfflinePlayer(getmsg("MSG0")));
 								myscore.setScore((int) fright.get(player.getName()));
 								
 							}
-							if (getConfig().getBoolean("multiworld."+player.getWorld().getName()+".health.enabled")) {
+							if (getConfig().getBoolean("multiworld."+player.getWorld().getName()+".stats.health.enabled")) {
 								Score myscore = objective.getScore(Bukkit.getOfflinePlayer(getmsg("MSG1")));
 								myscore.setScore((int) fright.get(player.getName()+".health"));
 								
 								
 							}
-							if (getConfig().getBoolean("multiworld."+player.getWorld().getName()+".hunger.enabled")) {
+							if (getConfig().getBoolean("multiworld."+player.getWorld().getName()+".stats.hunger.enabled")) {
 								Score myscore = objective.getScore(Bukkit.getOfflinePlayer(getmsg("MSG2")));
 								myscore.setScore((int) fright.get(player.getName()+".hunger"));
 								
 							}
-							if (getConfig().getBoolean("multiworld."+player.getWorld().getName()+".sleep.enabled")) {
+							if (getConfig().getBoolean("multiworld."+player.getWorld().getName()+".stats.sleep.enabled")) {
 								Score myscore = objective.getScore(Bukkit.getOfflinePlayer(getmsg("MSG3")));
 								myscore.setScore((int) fright.get(player.getName()+".sleep"));
 							}
-							if (getConfig().getBoolean("multiworld."+player.getWorld().getName()+".comfort.enabled")) {
+							if (getConfig().getBoolean("multiworld."+player.getWorld().getName()+".stats.comfort.enabled")) {
 								Score myscore = objective.getScore(Bukkit.getOfflinePlayer(getmsg("MSG4")));
 								myscore.setScore((int) fright.get(player.getName()+".comfort"));
 							}
@@ -628,20 +652,20 @@ public final class AaaaahDeath extends JavaPlugin implements Listener {
         options.put("language","english");
         options.put("multiworld.world",false);
         for(World world : getServer().getWorlds()) {
-        	options.put("multiworld."+world.getName()+".enabled",false);
+        	options.put("multiworld."+world.getName()+".enabled",true);
         	options.put("multiworld."+world.getName()+".deathban.time","false");
         	options.put("multiworld."+world.getName()+".gui",true);
-        	options.put("multiworld."+world.getName()+".happiness.enabled",true);
-        	options.put("multiworld."+world.getName()+".health.enabled",true);
-        	options.put("multiworld."+world.getName()+".hunger.enabled",true);
-        	options.put("multiworld."+world.getName()+".sleep.enabled",true);
-        	options.put("multiworld."+world.getName()+".comfort.enabled",true);
+        	options.put("multiworld."+world.getName()+".stats.happiness.enabled",true);
+        	options.put("multiworld."+world.getName()+".stats.health.enabled",true);
+        	options.put("multiworld."+world.getName()+".stats.hunger.enabled",true);
+        	options.put("multiworld."+world.getName()+".stats.sleep.enabled",true);
+        	options.put("multiworld."+world.getName()+".stats.comfort.enabled",true);
         	List<Integer> beautiful = Arrays.asList(171,35,45);
         	List<Integer> nice = Arrays.asList(5,155,17);
         	List<Integer> ugly = Arrays.asList(110,3,19,7,4,13,17);
-        	options.put("multiworld."+world.getName()+".comfort.beautiful","171,35,45");
-        	options.put("multiworld."+world.getName()+".comfort.nice","5,155,17");
-        	options.put("multiworld."+world.getName()+".comfort.ugly","110,3,19,7,4,13,17");
+        	options.put("multiworld."+world.getName()+".stats.comfort.beautiful","171,35,45");
+        	options.put("multiworld."+world.getName()+".stats.comfort.nice","5,155,17");
+        	options.put("multiworld."+world.getName()+".stats.comfort.ugly","110,3,19,7,4,13,17");
         }
         for (final Entry<String, Object> node : options.entrySet()) {
           	 if (!getConfig().contains(node.getKey())) {
@@ -726,9 +750,11 @@ public final class AaaaahDeath extends JavaPlugin implements Listener {
     public boolean checkperm(Player player,String perm) {
     	boolean hasperm = false;
     	String[] nodes = perm.split("\\.");
-    	
     	String n2 = "";
-    	if (player.hasPermission(perm)) {
+    	if (player==null) {
+    		return true;
+    	}
+    	else if (player.hasPermission(perm)) {
     		hasperm = true;
     	}
     	else if (player.isOp()==true) {
