@@ -343,7 +343,13 @@ public final class AaaaahDeath extends JavaPlugin implements Listener {
 				for (Player player:getServer().getOnlinePlayers()) {
 					ScoreboardManager manager = Bukkit.getScoreboardManager();
 					Scoreboard sidebar = manager.getNewScoreboard();
-					Objective objective = sidebar.registerNewObjective("test", "dummy");
+					Objective objective;
+					try {
+					objective = sidebar.registerNewObjective("ad", "dummy");
+					}
+					catch (Exception e) {
+						objective = sidebar.getObjective("ad");
+					}
 					objective.setDisplayName("Stats:");
 //					CommonScoreboard  board = CommonScoreboard.get(player);
 //					CommonObjective sidebar = board.getObjective(Display.SIDEBAR);
